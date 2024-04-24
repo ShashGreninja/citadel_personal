@@ -397,7 +397,7 @@ void evictElement(void *array, uint8_t length, size_t element_size, uint8_t inde
 #define OUTPOST_MORTAR_ANIMATION_DURATION_SECONDS 0.75f
 #define OUTPOST_PIERCE_ANIMATION_DURATION_SECONDS 0.75f
 
-void updateGameplayLogic(GameplayLogic *gameplay_logic, GameplayPhysics *gameplay_physics, GameplayDrawData *gameplay_draw_data)
+void updateGameplayLogic(MetaState *meta_state, GameplayLogic *gameplay_logic, GameplayPhysics *gameplay_physics, GameplayDrawData *gameplay_draw_data)
 {
 	float frame_time = GetFrameTime();
 
@@ -550,6 +550,7 @@ next_outpost: {}
 		if (Vector2Distance(gameplay_physics->tanks_physics[i].position,  gameplay_logic->tanks_path_points[gameplay_logic->tanks_path_points_count - 1]) < 60.f) {
 			Vector2 displacement = Vector2Subtract(gameplay_physics->tanks_physics[i].position, gameplay_logic->tanks_path_points[gameplay_logic->tanks_path_points_count - 1]);
 			gameplay_physics->tanks_physics[i].acceleration = Vector2Scale(gameplay_physics->tanks_physics[i].velocity, -5.f);
+			*meta_state = QUIT;
 		} else {
 			gameplay_physics->tanks_physics[i].velocity = Vector2ClampValue(gameplay_physics->tanks_physics[i].velocity, TANK_SPEED, TANK_SPEED);
 		}
@@ -1119,7 +1120,7 @@ int main(void)
 {
 	SetConfigFlags(FLAG_MSAA_4X_HINT); // Antialiasing (must be called before InitWindow())
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Citadel");
-	ToggleFullscreen();
+	//ToggleFullscreen();
 	SetTargetFPS(60);
 
 	InitAudioDevice();
@@ -1352,7 +1353,7 @@ respawn:
 			break;
 		case GAME:
 			updateGameUiLogic(&game_ui_logic, &gameplay_logic, &gameplay_physics, &gameplay_draw_data);
-			updateGameplayLogic(&gameplay_logic, &gameplay_physics, &gameplay_draw_data);
+			updateGameplayLogic(&meta_state, &gameplay_logic, &gameplay_physics, &gameplay_draw_data);
 			updateGameplayPhysics(&gameplay_physics);
 
 			updateGameplayDrawData(&gameplay_draw_data, &gameplay_physics);
